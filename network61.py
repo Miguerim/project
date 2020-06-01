@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.animation as animation 
 from scipy.integrate import solve_ivp
 from scipy.integrate import simps
 import random as rnd
@@ -21,8 +23,8 @@ alpha=0.82
 b=15
 delta=2
 
-t0=1
-t1=5
+t0=0
+t1=10
 P=0.2
 
 
@@ -133,7 +135,9 @@ def I_syn(G_out,B):
 def I(t):
     I=[]
     for i in range(N):
-        I.append(np.random.uniform(490,510))
+        if t>t0 and t<t1:
+            I.append(np.random.uniform(490,510))
+        else: I.append(0)
     return I
 
 def D_w(t):
@@ -167,14 +171,16 @@ u0=np.ones(2*N,)
 u0[:N]*=v_rest
 u0[N:2*N]*=0
 
-ts=(0,3)
+ts=(0,2)
 
 sol=solve_ivp(system,ts,u0,method='RK23')
 
+plt.figure()
 plt.plot(sol.t, sol.y[4])
 plt.plot(sol.t,sol.y[0])
 plt.show()
 
+plt.figure()
 plt.plot(sol.t,sol.y[104])
 plt.plot(sol.t,sol.y[100])
 plt.show()
@@ -184,7 +190,7 @@ plt.show()
 #for i in range(N):
 #    axs[i].plot(sol.t, sol.y[i])
 
-
+plt.figure()
 plt.eventplot(t_spike_arr)
 plt.show()
 
@@ -209,6 +215,7 @@ for i in range(1,len(sol.t)):
     chi=(sigma_hat_2/mean_sigma_2)**(1/2)
     Chi.append(chi)
 
+plt.figure()
 plt.plot(sol.t[1:],Chi)
 plt.show()
 
@@ -224,7 +231,7 @@ for t in sol.t:
     n=n/N
     A.append(n)
     
-
+plt.figure()
 plt.plot(sol.t,A)
 plt.show()
 
@@ -251,8 +258,63 @@ for t in range(len(sol.t)):
     entropy=-np.sum(np.multiply(weights,np.log(weights)))
     Entropy.append(entropy)
  
+plt.figure() 
 plt.plot(sol.t,Entropy)
 plt.show()
 
-plt.hist(Weights[len(sol.t)-1])
+#fig=plt.figure()
+#ax1=fig.add_subplot(111, projection='3d')
+
+#x=np.linspace()
+#dx=np.linspace
+
+#for i in range(len(sol.t)):
+#    Firing_rate.append([])
+#    for j in range(N):
+#        t_spike_arr[j]=np.array(t_spike_arr[j])
+#        if sol.t[i]>0:
+#            firing_rate=(1/sol.t[i])*len(t_spike_arr[j][t_spike_arr[j]<=sol.t[i]])
+#        else: firing_rate=0
+#        Firing_rate[i].append(firing_rate)
+
+        
+
+#anim_fig=plt.figure()
+#anim_ax=plt.axes(xlim=(0,10),ylim=(0,1))
+#anim_line,=anim_ax.plot([],[])
+
+#def init():
+#    anim_line.set_data([], [])
+#    return anim_line,
+
+#def animate(i):
+#    x = np.linspace(0,N-1,N)
+#    y = Firing_rate[i]
+#    anim_line.set_data(x, y)
+#    return anim_line,
+
+#anim=animation.FuncAnimation(anim_fig,animate,init_func=init,frames=len(sol.t),interval=1e-3*sol.t[1]-sol.t[0],blit=True)
+#plt.show()
+
+#U-I
+du=np.diff(sol.y[0])
+i=C*(du-g_L*(v_rest-sol.y[0][1:])-g_L*delta*np.exp((sol.y[0][1:]-theta)/delta)+sol.y[100][1:])
+
+plt.figure()
+plt.plot(i,sol.y[0][1:])
+plt.show()
+
+#U_n+1 - U_n
+plt.figure()
+plt.plot(sol.y[0][1:],sol.y[0][:len(sol.t)-1])
+plt.show()
+
+#A_n+1 - A_n
+plt.figure()
+plt.plot(A[1:],A[:len(A)-1])
+plt.show()
+
+#Entropy_n+1 - Entropy_n
+plt.figure()
+plt.plot(Entropy[1:],Entropy[:len(Entropy)-1])
 plt.show()
