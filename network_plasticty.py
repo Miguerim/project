@@ -176,7 +176,7 @@ def system(t,f):
     df[N:2*N]=(1/tau_w)*(alpha*(u-v_rest)-w)
     df[:N]=1/C*(g_L*(v_rest-u)+I_syn(G_out(S(t,t_spike(t,u))),B(t,u,M2(m)))+I(t)+g_L*delta*np.exp((u-theta)/delta)-w)
     w[u>theta]=w[u>theta]+b
-    df[2*N:]=5*(2-m)*Freq(t).flatten()
+    df[2*N:]=10*(2-m)*Freq(t).flatten()-5*m
     return df
 
 #u0=v_rest*np.ones(N,)
@@ -186,7 +186,7 @@ u0[:N]*=v_rest
 u0[N:2*N]*=0
 u0[2*N:]=M1.flatten()
 
-ts=(0,3)
+ts=(0,1)
 
 
 sol=solve_ivp(system,ts,u0,method='RK23')
